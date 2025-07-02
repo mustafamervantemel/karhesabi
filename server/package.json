@@ -1,0 +1,25 @@
+{
+  "name": "karhesap-trendyol-proxy",
+  "version": "1.0.0",
+  "description": "Trendyol API Proxy Server for KarHesap",
+  "main": "trendyol-proxy.js",
+  "scripts": {
+    "start": "node trendyol-proxy.js",
+    "dev": "nodemon trendyol-proxy.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["trendyol", "api", "proxy", "ecommerce", "integration"],
+  "author": "KarHesap Team",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
