@@ -35,7 +35,17 @@ function TrendyolIntegration() {
     sellerId: '',
     apiKey: '',
     apiSecret: '',
+    syncDays: 3,
+    orderStatus: 'Onay Bekliyor',
   });
+
+  const orderStatusOptions = [
+    'Onay Bekliyor',
+    'Hazırlanıyor',
+    'Kargoya Verildi',
+    'Teslim Edildi',
+    'İptal Edildi',
+  ];
 
   useEffect(() => {
     if (!currentUser || !userProfile?.isPremium) {
@@ -63,11 +73,7 @@ function TrendyolIntegration() {
     
     try {
       // Yeni servis ile bağlantı testi
-      const result = await trendyolService.testConnection(
-        form.apiKey,
-        form.apiSecret,
-        form.sellerId
-      );
+      const result = await trendyolService.testConnection(form.apiKey, form.apiSecret, form.sellerId);
 
       if (result.success) {
         setConnectionStatus('success');
@@ -92,11 +98,11 @@ function TrendyolIntegration() {
     setLoading(true);
     try {
       // Servis bilgilerini ayarla
-      trendyolService.setCredentials(form.apiKey, form.apiSecret, sellerInfo?.id);
+      trendyolService.setCredentials(form.apiKey, form.apiSecret, form.sellerId);
 
       await updateUserProfile(currentUser.uid, {
         trendyolConnected: true,
-        trendyolSellerId: sellerInfo?.id,
+        trendyolSellerId: form.sellerId,
         trendyolSellerName: sellerInfo?.name,
         integrationCompletedAt: new Date().toISOString(),
         trendyolApiKey: form.apiKey,
