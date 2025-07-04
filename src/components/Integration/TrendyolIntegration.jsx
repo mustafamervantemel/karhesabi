@@ -33,10 +33,8 @@ function TrendyolIntegration() {
   // Kullanıcıdan alınacak entegrasyon bilgileri
   const [form, setForm] = useState({
     sellerId: '',
-    integrationCode: '',
     apiKey: '',
     apiSecret: '',
-    token: ''
   });
 
   useEffect(() => {
@@ -103,8 +101,6 @@ function TrendyolIntegration() {
         integrationCompletedAt: new Date().toISOString(),
         trendyolApiKey: form.apiKey,
         trendyolApiSecret: form.apiSecret,
-        trendyolToken: form.token,
-        trendyolIntegrationCode: form.integrationCode
       });
       
       toast.success('Entegrasyon başarıyla tamamlandı!');
@@ -243,21 +239,6 @@ function TrendyolIntegration() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500"
                   required
                   placeholder="J5wbnuUDH8ABEVvchUpQ"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <Database className="w-4 h-4 inline mr-1" />
-                  Integration Code (Opsiyonel)
-                </label>
-                <input
-                  type="text"
-                  name="integrationCode"
-                  value={form.integrationCode}
-                  onChange={handleFormChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                  placeholder="e6d3d8a0-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                 />
               </div>
 

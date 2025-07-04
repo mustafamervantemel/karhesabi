@@ -61,27 +61,19 @@ class TrendyolService {
   }
 
   // Bağlantı testi
-  async testConnection(apiKey, apiSecret, sellerId = null) {
-    try {
-      const response = await this.makeProxyRequest('/test-connection', {
-        method: 'POST',
-        body: {
-          apiKey,
-          apiSecret,
-          sellerId
-        }
-      });
-
-      if (response.success) {
-        this.setCredentials(apiKey, apiSecret, response.sellerInfo?.id || sellerId);
-        return response;
-      }
-      
-      throw new Error(response.error || 'Bağlantı testi başarısız');
-    } catch (error) {
-      console.error('Connection test failed:', error);
-      throw error;
+  async testConnection() {
+    if (!this.apiKey || !this.apiSecret || !this.sellerId) {
+      throw new Error('API bilgileri eksik');
     }
+    const response = await this.makeProxyRequest('/test-connection', {
+      method: 'POST',
+      body: {
+        apiKey: this.apiKey,
+        apiSecret: this.apiSecret,
+        sellerId: this.sellerId
+      }
+    });
+    return response;
   }
 
   // Seller bilgilerini al
