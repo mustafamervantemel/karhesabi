@@ -18,7 +18,7 @@ class TrendyolService {
   // Proxy üzerinden API isteği gönder
   async makeProxyRequest(endpoint, options = {}) {
     try {
-      const url = `${PROXY_BASE_URL}${endpoint}`;
+      let url = `${PROXY_BASE_URL}${endpoint}`;
       const requestOptions = {
         method: options.method || 'GET',
         headers: {
