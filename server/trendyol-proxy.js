@@ -15,16 +15,19 @@ const httpsAgent = new https.Agent({
 });
 
 // Trendyol API base URL
-const TRENDYOL_BASE_URL = 'https://api.trendyol.com/sapigw';
+const TRENDYOL_BASE_URL = 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
   const url = `${TRENDYOL_BASE_URL}${endpoint}`;
   console.log('Trendyol API URL:', url);
+  const userAgent = options.sellerId
+    ? `${options.sellerId} - SelfIntegration`
+    : 'SelfIntegration';
   const headers = {
     Authorization: `Basic ${Buffer.from(`${options.apiKey}:${options.apiSecret}`).toString('base64')}`,
     'Content-Type': 'application/json',
-    'User-Agent': 'KarHesap/1.0.0',
+    'User-Agent': userAgent,
     ...options.headers
   };
 
