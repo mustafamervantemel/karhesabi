@@ -1,13 +1,14 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { auth, db } from "../config/firebase";
+import { auth, db, googleProvider } from "../config/firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   updateProfile,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
@@ -44,6 +45,35 @@ export function AuthProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      
+      // Kullanıcının daha önce kaydolup olmadığını kontrol et
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      
+      if (!userDoc.exists()) {
+        // Yeni kullanıcı, Firestore'a kaydet
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          fullName: user.displayName,
+          username: user.email.split('@')[0],
+          isPremium: false,
+          aiPromptCount: 0,
+          createdAt: new Date(),
+          provider: 'google',
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      throw error;
+    }
+  };
+
   const logout = () => signOut(auth);
 
   const value = {
@@ -51,6 +81,7 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
+    signInWithGoogle,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

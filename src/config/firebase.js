@@ -4,7 +4,6 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// Firebase config'in doğru, burada aynen kalabilir
 const firebaseConfig = {
   apiKey: "AIzaSyC56lc7FmQ2d_X9THdAyfgyKRyhTK59-9o",
   authDomain: "karhesabi-21f0d.firebaseapp.com",
