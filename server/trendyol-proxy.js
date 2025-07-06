@@ -10,10 +10,22 @@ const app = express();
 // Production için güvenlik ayarları
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://karhesabi.vercel.app', 'https://www.karhesabi.vercel.app']
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+    ? [
+        'https://karhesabi.vercel.app', 
+        'https://www.karhesabi.vercel.app',
+        'https://karhesabi-git-main-mcts-projects-2b8b6936.vercel.app',
+        'https://karhesabi-mcts-projects-2b8b6936.vercel.app'
+      ]
+    : [
+        'http://localhost:3000', 
+        'http://127.0.0.1:3000', 
+        'http://localhost:5173', 
+        'http://127.0.0.1:5173'
+      ],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
 app.use(cors(corsOptions));
@@ -33,7 +45,22 @@ const TRENDYOL_BASE_URL = process.env.NODE_ENV === 'production'
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
-  const url = `${TRENDYOL_BASE_URL}${endpoint}`;
+  let url = `${TRENDYOL_BASE_URL}${endpoint}`;
+  
+  // Query parametrelerini URL'e ekle
+  if (options.params) {
+    const queryParams = new URLSearchParams();
+    Object.keys(options.params).forEach(key => {
+      if (options.params[key] !== null && options.params[key] !== undefined) {
+        queryParams.append(key, options.params[key]);
+      }
+    });
+    const queryString = queryParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+  }
+  
   console.log('Trendyol API URL:', url);
   const userAgent = options.sellerId
     ? `${options.sellerId} - SelfIntegration`
@@ -41,8 +68,7 @@ async function makeTrendyolRequest(endpoint, options = {}) {
   const headers = {
     Authorization: `Basic ${Buffer.from(`${options.apiKey}:${options.apiSecret}`).toString('base64')}`,
     'Content-Type': 'application/json',
-    'User-Agent': userAgent,
-    ...options.headers
+    'User-Agent': userAgent
   };
 
   const fetchOptions = {
@@ -63,12 +89,13 @@ async function makeTrendyolRequest(endpoint, options = {}) {
 // Connection test
 app.post('/api/trendyol/test-connection', async (req, res) => {
   const { apiKey, apiSecret, sellerId } = req.body;
-  if (!apiKey || !apiSecret || !sellerId) {
-    return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
+  if (!apiKey || !apiSecret) {
+    return res.status(400).json({ success: false, error: 'API Key ve API Secret gerekli' });
   }
   try {
     const info = await makeTrendyolRequest(`/suppliers`, { apiKey, apiSecret });
-    res.json({ success: true, sellerInfo: info[0] || info });
+    const sellerInfo = Array.isArray(info) ? info[0] : info;
+    res.json({ success: true, sellerInfo });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -97,7 +124,7 @@ app.get('/api/trendyol/products', async (req, res) => {
   try {
     const products = await makeTrendyolRequest(
       `/suppliers/${sellerId}/products`,
-      { apiKey, apiSecret, headers: { page, size } }
+      { apiKey, apiSecret, params: { page, size } }
     );
     res.json({ success: true, products });
   } catch (err) {
@@ -113,8 +140,9 @@ app.get('/api/trendyol/orders', async (req, res) => {
   }
   try {
     let endpoint = `/suppliers/${sellerId}/orders`;
-    if (status) endpoint += `?status=${status}`;
-    const orders = await makeTrendyolRequest(endpoint, { apiKey, apiSecret, headers: { page, size } });
+    const params = { page, size };
+    if (status) params.status = status;
+    const orders = await makeTrendyolRequest(endpoint, { apiKey, apiSecret, params });
     res.json({ success: true, orders });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });

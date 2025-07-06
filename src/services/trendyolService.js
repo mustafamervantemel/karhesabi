@@ -1,5 +1,7 @@
 // Trendyol API Service - Proxy Server üzerinden
-const PROXY_BASE_URL = import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
+const PROXY_BASE_URL = import.meta.env.MODE === 'production' 
+  ? import.meta.env.VITE_PROXY_BASE_URL_PRODUCTION || 'https://karhesabi-proxy.up.railway.app/api/trendyol'
+  : import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
 
 class TrendyolService {
   constructor() {

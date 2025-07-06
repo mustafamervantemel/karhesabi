@@ -78,6 +78,10 @@ function TrendyolIntegration() {
       if (result.success) {
         setConnectionStatus('success');
         setSellerInfo(result.sellerInfo);
+        // Seller ID'yi otomatik olarak doldur
+        if (result.sellerInfo && result.sellerInfo.id) {
+          setForm(prev => ({ ...prev, sellerId: result.sellerInfo.id }));
+        }
         toast.success('Trendyol bağlantısı başarılı!');
         setStep(2);
       } else {

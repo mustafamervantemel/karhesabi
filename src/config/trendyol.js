@@ -3,12 +3,12 @@
 // Production'da bu bilgiler environment variables olarak saklanmalı
 
 export const TRENDYOL_CONFIG = {
-  // Geliştirme için test mağazası bilgileri
+  // Geliştirme için test mağazası bilgileri (gerçek API bilgileri kullanılacak)
   DEVELOPMENT: {
-    integrationCode: 'e6d3d8a0-f282-492a-ab8b-d74df5e1b9d8',
-    apiKey: 'GAouyKM683D8MFr5FpfT',
-    apiSecret: 'J5wbnuUDH8ABEVvchUpQ',
-    token: 'R0FvdXlLTTY4M0Q4TUZyNUZwZlQ6SjV3Ym51VURIOEFCRVZ2Y2hVcFE=',
+    integrationCode: null, // Kullanıcıdan alınacak
+    apiKey: null, // Kullanıcıdan alınacak
+    apiSecret: null, // Kullanıcıdan alınacak
+    token: null, // API Key:Secret'tan oluşturulacak
     baseUrl: 'https://api.trendyol.com/sapigw',
     sellerId: null // API'den alınacak
   },
