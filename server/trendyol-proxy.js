@@ -3,6 +3,7 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const cors = require('cors');
 const https = require('https');
 const path = require('path');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
@@ -14,8 +15,10 @@ const httpsAgent = new https.Agent({
   maxVersion: 'TLSv1.3'
 });
 
-// Trendyol API base URL
-const TRENDYOL_BASE_URL = 'https://stageapigw.trendyol.com';
+// Trendyol API base URL - Production/Stage ortamına göre
+const TRENDYOL_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://api.trendyol.com/sapigw'
+  : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {

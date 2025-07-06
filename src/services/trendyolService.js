@@ -1,5 +1,5 @@
 // Trendyol API Service - Proxy Server üzerinden
-const PROXY_BASE_URL = 'http://localhost:4000/api/trendyol';
+const PROXY_BASE_URL = import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
 
 class TrendyolService {
   constructor() {
@@ -61,16 +61,22 @@ class TrendyolService {
   }
 
   // Bağlantı testi
-  async testConnection() {
-    if (!this.apiKey || !this.apiSecret || !this.sellerId) {
+  async testConnection(apiKey, apiSecret, sellerId) {
+    // Parametreler verilmişse geçici olarak kullan
+    const testApiKey = apiKey || this.apiKey;
+    const testApiSecret = apiSecret || this.apiSecret;
+    const testSellerId = sellerId || this.sellerId;
+    
+    if (!testApiKey || !testApiSecret) {
       throw new Error('API bilgileri eksik');
     }
+    
     const response = await this.makeProxyRequest('/test-connection', {
       method: 'POST',
       body: {
-        apiKey: this.apiKey,
-        apiSecret: this.apiSecret,
-        sellerId: this.sellerId
+        apiKey: testApiKey,
+        apiSecret: testApiSecret,
+        sellerId: testSellerId
       }
     });
     return response;
