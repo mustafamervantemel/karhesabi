@@ -9,23 +9,38 @@ const app = express();
 
 // Production için güvenlik ayarları
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        'https://karhesabi.vercel.app', 
-        'https://www.karhesabi.vercel.app',
-        'https://karhesabi-git-main-mcts-projects-2b8b6936.vercel.app',
-        'https://karhesabi-mcts-projects-2b8b6936.vercel.app'
-      ]
-    : [
-        'http://localhost:3000', 
-        'http://127.0.0.1:3000', 
-        'http://localhost:5173', 
-        'http://127.0.0.1:5173'
-      ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://karhesabi.vercel.app', 
+      'https://www.karhesabi.vercel.app',
+      'https://karhesabi-git-main-mcts-projects-2b8b6936.vercel.app',
+      'https://karhesabi-mcts-projects-2b8b6936.vercel.app',
+      'http://localhost:3000', 
+      'http://127.0.0.1:3000', 
+      'http://localhost:5173', 
+      'http://127.0.0.1:5173',
+      'http://192.168.1.51:3000',
+      'http://192.168.1.51:5173',
+      'http://167.71.42.27:3000',
+      'http://167.71.42.27:5173',
+      'https://167.71.42.27:3000',
+      'https://167.71.42.27:5173'
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, false);
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Access-Control-Allow-Origin']
 };
 
 app.use(cors(corsOptions));
@@ -38,10 +53,12 @@ const httpsAgent = new https.Agent({
   maxVersion: 'TLSv1.3'
 });
 
-// Trendyol API base URL - Production/Stage ortamına göre
-const TRENDYOL_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://api.trendyol.com/sapigw'
-  : 'https://stageapigw.trendyol.com';
+// Trendyol API base URL - Test/Production ortamına göre
+const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'test' 
+  ? 'https://stageapigw.trendyol.com'
+  : process.env.NODE_ENV === 'production' 
+    ? 'https://api.trendyol.com/sapigw'
+    : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
@@ -264,4 +281,7 @@ app.get(/^\/(?!api).*/, (req, res) => {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Trendyol Proxy Server running on port ${PORT}`);
+  console.log(`🌐 Server accessible at: http://192.168.1.51:${PORT}`);
+  console.log(`🔧 Environment: ${process.env.TRENDYOL_ENV || 'development'}`);
+  console.log(`📡 Trendyol API: ${process.env.TRENDYOL_ENV === 'test' ? 'https://stageapigw.trendyol.com' : 'https://api.trendyol.com/sapigw'}`);
 });

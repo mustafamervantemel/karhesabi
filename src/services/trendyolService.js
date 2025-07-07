@@ -1,7 +1,17 @@
 // Trendyol API Service - Proxy Server üzerinden
-const PROXY_BASE_URL = import.meta.env.MODE === 'production' 
-  ? import.meta.env.VITE_PROXY_BASE_URL_PRODUCTION || 'https://karhesabi-proxy.up.railway.app/api/trendyol'
-  : import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
+const getProxyBaseUrl = () => {
+  const mode = import.meta.env.VITE_TRENDYOL_ENV || import.meta.env.MODE;
+  
+  if (mode === 'test') {
+    return import.meta.env.VITE_PROXY_BASE_URL_TEST || 'http://167.71.42.27:4000/api/trendyol';
+  } else if (mode === 'production') {
+    return import.meta.env.VITE_PROXY_BASE_URL_PRODUCTION || 'https://karhesabi-proxy.up.railway.app/api/trendyol';
+  } else {
+    return import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
+  }
+};
+
+const PROXY_BASE_URL = getProxyBaseUrl();
 
 class TrendyolService {
   constructor() {

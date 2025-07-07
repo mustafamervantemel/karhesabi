@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:test": "VITE_TRENDYOL_ENV=test vite --host 0.0.0.0 --port 5173",
     "build": "vite build",
+    "build:test": "VITE_TRENDYOL_ENV=test vite build --mode test",
     "lint": "eslint .",
     "preview": "vite preview",
     "server:dev": "cd server && npm run dev",
+    "server:test": "cd server && TRENDYOL_ENV=test node trendyol-proxy.js",
     "server:start": "cd server && npm start",
     "server:install": "cd server && npm install",
     "build:full": "npm run build && npm run server:install",
-    "build:production": "NODE_ENV=production vite build --mode production"
+    "build:production": "NODE_ENV=production vite build --mode production",
+    "test:start": "concurrently \"npm run server:test\" \"npm run dev:test\""
   },
   "dependencies": {
     "firebase": "^10.13.1",
