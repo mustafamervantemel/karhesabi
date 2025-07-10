@@ -1,5 +1,7 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const https = require('https');
+
+// Use native fetch (Node.js 18+) or fallback to node-fetch
+const fetch = globalThis.fetch || require('node-fetch');
 
 // TLS 1.2+ için agent
 const httpsAgent = new https.Agent({
@@ -50,11 +52,31 @@ async function makeTrendyolRequest(endpoint, options = {}) {
   };
 
   const response = await fetch(url, fetchOptions);
-  const data = await response.json();
+  
+  // Check if response is ok first
   if (!response.ok) {
-    throw new Error(`Trendyol API Error: ${response.status} – ${data.message || response.statusText}`);
+    let errorMessage = `Trendyol API Error: ${response.status} - ${response.statusText}`;
+    try {
+      const errorData = await response.json();
+      errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
+    } catch (e) {
+      // If JSON parsing fails, use the response text
+      const errorText = await response.text();
+      errorMessage += ` - ${errorText}`;
+    }
+    throw new Error(errorMessage);
   }
-  return data;
+  
+  // Try to parse JSON response
+  try {
+    const data = await response.json();
+    return data;
+  } catch (e) {
+    // If JSON parsing fails, return text response
+    const textData = await response.text();
+    console.warn('Non-JSON response received:', textData);
+    return { rawResponse: textData };
+  }
 }
 
 // CORS ayarları
@@ -226,6 +248,11 @@ export default async function handler(req, res) {
     }
   } catch (err) {
     console.error('API Error:', err);
-    return res.status(500).json({ success: false, error: err.message });
+    console.error('Stack:', err.stack);
+    return res.status(500).json({ 
+      success: false, 
+      error: err.message || 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    });
   }
 }
