@@ -198,7 +198,7 @@ function ProfitCalculator() {
     if (!result) return [];
     return [
       {
-        name: "Ür Maliyeti",
+        name: "Ü Maliyeti",
         value: parseFloat(formData.productCost) || 0,
         color: "#ef4444",
         icon: "📦",
