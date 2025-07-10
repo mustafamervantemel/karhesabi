@@ -24,6 +24,8 @@ const corsOptions = {
       'http://167.71.42.27:3000',
       'http://167.71.42.27:5173',
       'https://167.71.42.27:3000',
+      'http://167.71.42.27:4000',
+      'https://167.71.42.27:4000',
       'https://167.71.42.27:5173'
     ];
     
@@ -57,7 +59,7 @@ const httpsAgent = new https.Agent({
 const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'test' 
   ? 'https://stageapigw.trendyol.com'
   : process.env.NODE_ENV === 'production' 
-    ? 'https://api.trendyol.com/sapigw'
+    ? 'https://apigw.trendyol.com'
     : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
@@ -283,5 +285,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Trendyol Proxy Server running on port ${PORT}`);
   console.log(`🌐 Server accessible at: http://192.168.1.51:${PORT}`);
   console.log(`🔧 Environment: ${process.env.TRENDYOL_ENV || 'development'}`);
-  console.log(`📡 Trendyol API: ${process.env.TRENDYOL_ENV === 'test' ? 'https://stageapigw.trendyol.com' : 'https://api.trendyol.com/sapigw'}`);
+  console.log(`📡 Trendyol API: ${TRENDYOL_BASE_URL}`);
 });
