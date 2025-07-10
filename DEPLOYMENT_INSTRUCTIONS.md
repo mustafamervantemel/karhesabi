@@ -32,8 +32,6 @@ Vercel dashboard'da şu environment variables'ları ekleyin:
 VITE_PROXY_BASE_URL_PRODUCTION=https://RAILWAY_URL_BURAYA/api/trendyol
 ```
 
-## 3. Kodu Vercel'e Deploy Etme
-
 ```bash
 # Değişiklikleri commit edin
 git add .
