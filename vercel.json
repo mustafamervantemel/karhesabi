@@ -3,7 +3,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server/trendyol-proxy.js"
+      "dest": "/api/trendyol-proxy.js"
     },
     {
       "src": "/(.*)",
@@ -15,7 +15,7 @@
     "TRENDYOL_ENV": "test"
   },
   "functions": {
-    "server/trendyol-proxy.js": {
+    "api/trendyol-proxy.js": {
       "maxDuration": 10
     }
   }
