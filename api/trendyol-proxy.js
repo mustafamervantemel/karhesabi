@@ -9,12 +9,12 @@ const httpsAgent = new https.Agent({
   maxVersion: 'TLSv1.3'
 });
 
-// Trendyol API base URL - Test/Production ortamına göre
-const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'test' 
-  ? 'https://stageapi.trendyol.com'
+// Trendyol API base URL - Production ortamı
+const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'production' 
+  ? 'https://api.trendyol.com'
   : process.env.NODE_ENV === 'production' 
     ? 'https://api.trendyol.com'
-    : 'https://stageapi.trendyol.com';
+    : 'https://api.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
@@ -218,8 +218,8 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve stocks gerekli' });
         }
         const stockResult = await makeTrendyolRequest(
-          `/gpgw/v1/${sellerIdStock}/stocks`,
-          { method: 'POST', apiKey: apiKeyStock, apiSecret: apiSecretStock, sellerId: sellerIdStock, body: { stocks } }
+          `/sapigw/suppliers/${sellerIdStock}/products/stock-updates`,
+          { method: 'POST', apiKey: apiKeyStock, apiSecret: apiSecretStock, sellerId: sellerIdStock, body: { items: stocks } }
         );
         return res.json({ success: true, batchId: stockResult.batchId });
 
@@ -232,8 +232,8 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve priceInfos gerekli' });
         }
         const priceResult = await makeTrendyolRequest(
-          `/gpgw/v1/${sellerIdPrice}/prices`,
-          { method: 'POST', apiKey: apiKeyPrice, apiSecret: apiSecretPrice, sellerId: sellerIdPrice, body: { priceInfos } }
+          `/sapigw/suppliers/${sellerIdPrice}/products/price-updates`,
+          { method: 'POST', apiKey: apiKeyPrice, apiSecret: apiSecretPrice, sellerId: sellerIdPrice, body: { items: priceInfos } }
         );
         return res.json({ success: true, batchId: priceResult.batchId });
 
@@ -246,7 +246,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve products gerekli' });
         }
         const productResult = await makeTrendyolRequest(
-          `/gpgw/v2/${sellerIdProduct}/products`,
+          `/sapigw/suppliers/${sellerIdProduct}/v2/products`,
           { method: 'POST', apiKey: apiKeyProduct, apiSecret: apiSecretProduct, sellerId: sellerIdProduct, body: { products: productList } }
         );
         return res.json({ success: true, batchId: productResult.batchId });

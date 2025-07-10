@@ -16,7 +16,7 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "TRENDYOL_ENV": "test"
+    "TRENDYOL_ENV": "production"
   },
   "functions": {
     "api/trendyol-proxy.js": {
