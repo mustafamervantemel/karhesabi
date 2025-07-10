@@ -11,10 +11,10 @@ const httpsAgent = new https.Agent({
 
 // Trendyol API base URL - Test/Production ortamına göre
 const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'test' 
-  ? 'https://stageapigw.trendyol.com'
+  ? 'https://stageapi.trendyol.com'
   : process.env.NODE_ENV === 'production' 
-    ? 'https://apigw.trendyol.com'
-    : 'https://stageapigw.trendyol.com';
+    ? 'https://api.trendyol.com'
+    : 'https://stageapi.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
@@ -156,34 +156,6 @@ export default async function handler(req, res) {
         const orders = await makeTrendyolRequest(endpoint, { apiKey: apiKey4, apiSecret: apiSecret4, params });
         return res.json({ success: true, orders });
 
-      case 'trendyol/update-stock':
-        if (method !== 'POST') {
-          return res.status(405).json({ success: false, error: 'Method not allowed' });
-        }
-        const { apiKey: apiKey5, apiSecret: apiSecret5, sellerId: sellerId5, stockUpdates } = body;
-        if (!apiKey5 || !apiSecret5 || !sellerId5 || !stockUpdates) {
-          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve stockUpdates gerekli' });
-        }
-        const result = await makeTrendyolRequest(
-          `/suppliers/${sellerId5}/products/stock-updates`,
-          { method: 'POST', apiKey: apiKey5, apiSecret: apiSecret5, body: { items: stockUpdates } }
-        );
-        return res.json({ success: true, result });
-
-      case 'trendyol/update-price':
-        if (method !== 'POST') {
-          return res.status(405).json({ success: false, error: 'Method not allowed' });
-        }
-        const { apiKey: apiKey6, apiSecret: apiSecret6, sellerId: sellerId6, priceUpdates } = body;
-        if (!apiKey6 || !apiSecret6 || !sellerId6 || !priceUpdates) {
-          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve priceUpdates gerekli' });
-        }
-        const result2 = await makeTrendyolRequest(
-          `/suppliers/${sellerId6}/products/price-updates`,
-          { method: 'POST', apiKey: apiKey6, apiSecret: apiSecret6, body: { items: priceUpdates } }
-        );
-        return res.json({ success: true, result: result2 });
-
       case 'trendyol/categories':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
@@ -236,6 +208,95 @@ export default async function handler(req, res) {
           { method: 'POST', apiKey: apiKey10, apiSecret: apiSecret10, body: shipmentData }
         );
         return res.json({ success: true, result: result4 });
+
+      case 'trendyol/update-stock':
+        if (method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyStock, apiSecret: apiSecretStock, sellerId: sellerIdStock, stocks } = body;
+        if (!apiKeyStock || !apiSecretStock || !sellerIdStock || !stocks) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve stocks gerekli' });
+        }
+        const stockResult = await makeTrendyolRequest(
+          `/gpgw/v1/${sellerIdStock}/stocks`,
+          { method: 'POST', apiKey: apiKeyStock, apiSecret: apiSecretStock, sellerId: sellerIdStock, body: { stocks } }
+        );
+        return res.json({ success: true, batchId: stockResult.batchId });
+
+      case 'trendyol/update-price':
+        if (method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyPrice, apiSecret: apiSecretPrice, sellerId: sellerIdPrice, priceInfos } = body;
+        if (!apiKeyPrice || !apiSecretPrice || !sellerIdPrice || !priceInfos) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve priceInfos gerekli' });
+        }
+        const priceResult = await makeTrendyolRequest(
+          `/gpgw/v1/${sellerIdPrice}/prices`,
+          { method: 'POST', apiKey: apiKeyPrice, apiSecret: apiSecretPrice, sellerId: sellerIdPrice, body: { priceInfos } }
+        );
+        return res.json({ success: true, batchId: priceResult.batchId });
+
+      case 'trendyol/create-product':
+        if (method !== 'POST') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyProduct, apiSecret: apiSecretProduct, sellerId: sellerIdProduct, products: productList } = body;
+        if (!apiKeyProduct || !apiSecretProduct || !sellerIdProduct || !productList) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve products gerekli' });
+        }
+        const productResult = await makeTrendyolRequest(
+          `/gpgw/v2/${sellerIdProduct}/products`,
+          { method: 'POST', apiKey: apiKeyProduct, apiSecret: apiSecretProduct, sellerId: sellerIdProduct, body: { products: productList } }
+        );
+        return res.json({ success: true, batchId: productResult.batchId });
+
+      case 'trendyol/check-batch-status':
+        if (method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyBatch, apiSecret: apiSecretBatch, sellerId: sellerIdBatch, batchId } = query;
+        if (!apiKeyBatch || !apiSecretBatch || !sellerIdBatch || !batchId) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve batchId gerekli' });
+        }
+        const batchResult = await makeTrendyolRequest(
+          `/gpgw/v1/${sellerIdBatch}/check-status`,
+          { 
+            apiKey: apiKeyBatch, 
+            apiSecret: apiSecretBatch, 
+            sellerId: sellerIdBatch,
+            params: { batchId } 
+          }
+        );
+        return res.json({ success: true, result: batchResult });
+
+      case 'trendyol/get-categories':
+        if (method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyCat, apiSecret: apiSecretCat, sellerId: sellerIdCat } = query;
+        if (!apiKeyCat || !apiSecretCat || !sellerIdCat) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
+        }
+        const categoriesResult = await makeTrendyolRequest(
+          `/gpgw/v1/${sellerIdCat}/lookup/product-categories/by-barcodes`,
+          { apiKey: apiKeyCat, apiSecret: apiSecretCat, sellerId: sellerIdCat }
+        );
+        return res.json({ success: true, categories: categoriesResult });
+
+      case 'trendyol/get-origins':
+        if (method !== 'GET') {
+          return res.status(405).json({ success: false, error: 'Method not allowed' });
+        }
+        const { apiKey: apiKeyOrigin, apiSecret: apiSecretOrigin, sellerId: sellerIdOrigin } = query;
+        if (!apiKeyOrigin || !apiSecretOrigin || !sellerIdOrigin) {
+          return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
+        }
+        const originsResult = await makeTrendyolRequest(
+          `/gpgw/v1/${sellerIdOrigin}/lookup/origins`,
+          { apiKey: apiKeyOrigin, apiSecret: apiSecretOrigin, sellerId: sellerIdOrigin }
+        );
+        return res.json({ success: true, origins: originsResult });
 
       case 'health':
         if (method !== 'GET') {
