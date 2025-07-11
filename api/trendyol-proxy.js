@@ -101,11 +101,11 @@ export default async function handler(req, res) {
   });
 
   const { method, query, body } = req;
-  const path = req.url.replace('/api/', '');
+  const path = req.url.replace('/api/', '').replace('trendyol/', '');
 
   try {
     switch (path) {
-      case 'trendyol/test-connection':
+      case 'test-connection':
         if (method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -117,7 +117,7 @@ export default async function handler(req, res) {
         const sellerInfo = Array.isArray(info) ? info[0] : info;
         return res.json({ success: true, sellerInfo });
 
-      case 'trendyol/seller-info':
+      case 'seller-info':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -128,7 +128,7 @@ export default async function handler(req, res) {
         const sellerInfo2 = await makeTrendyolRequest('/suppliers', { apiKey: apiKey2, apiSecret: apiSecret2 });
         return res.json({ success: true, sellerInfo: sellerInfo2[0] || sellerInfo2 });
 
-      case 'trendyol/products':
+      case 'products':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -142,7 +142,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, products });
 
-      case 'trendyol/orders':
+      case 'orders':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -156,7 +156,7 @@ export default async function handler(req, res) {
         const orders = await makeTrendyolRequest(endpoint, { apiKey: apiKey4, apiSecret: apiSecret4, params });
         return res.json({ success: true, orders });
 
-      case 'trendyol/categories':
+      case 'categories':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -167,7 +167,7 @@ export default async function handler(req, res) {
         const categories = await makeTrendyolRequest('/product-categories', { apiKey: apiKey7, apiSecret: apiSecret7 });
         return res.json({ success: true, categories });
 
-      case 'trendyol/shipment-providers':
+      case 'shipment-providers':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, providers });
 
-      case 'trendyol/update-order-status':
+      case 'update-order-status':
         if (method !== 'PUT') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -195,7 +195,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, result: result3 });
 
-      case 'trendyol/create-shipment':
+      case 'create-shipment':
         if (method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -209,7 +209,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, result: result4 });
 
-      case 'trendyol/update-stock':
+      case 'update-stock':
         if (method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -223,7 +223,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, batchId: stockResult.batchId });
 
-      case 'trendyol/update-price':
+      case 'update-price':
         if (method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -237,7 +237,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, batchId: priceResult.batchId });
 
-      case 'trendyol/create-product':
+      case 'create-product':
         if (method !== 'POST') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -251,7 +251,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, batchId: productResult.batchId });
 
-      case 'trendyol/check-batch-status':
+      case 'check-batch-status':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -270,7 +270,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, result: batchResult });
 
-      case 'trendyol/get-categories':
+      case 'get-categories':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
@@ -284,7 +284,7 @@ export default async function handler(req, res) {
         );
         return res.json({ success: true, categories: categoriesResult });
 
-      case 'trendyol/get-origins':
+      case 'get-origins':
         if (method !== 'GET') {
           return res.status(405).json({ success: false, error: 'Method not allowed' });
         }
