@@ -30,7 +30,7 @@ export const TRENDYOL_CONFIG = {
     apiKey: import.meta.env.VITE_TRENDYOL_API_KEY,
     apiSecret: import.meta.env.VITE_TRENDYOL_API_SECRET,
     token: import.meta.env.VITE_TRENDYOL_TOKEN,
-    baseUrl: 'https://api.trendyol.com/sapigw',
+    baseUrl: 'https://api.trendyol.com',
     sellerId: null
   }
 };

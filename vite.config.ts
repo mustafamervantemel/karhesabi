@@ -25,11 +25,11 @@ export default defineConfig({
     host: true,
     port: 3000,
     cors: {
-      origin: ['http://localhost:3000', 'https://karheesabi-vercell.app'],
+      origin: ['http://localhost:3000', 'https://karhesabi.vercel.app'],
       credentials: true
     }
   },
   define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 });

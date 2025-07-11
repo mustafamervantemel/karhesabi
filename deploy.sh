@@ -55,22 +55,22 @@ ssh root@167.71.42.27 << 'EOF'
     cd server
     npm install
 
-    # Copy test environment file
+    # Copy production environment file
     cd ..
-    cp .env.test .env
+    cp .env.production .env
 
-    # Build frontend
-    echo "🔨 Building frontend..."
-    npm run build
+    # Build frontend for production
+    echo "🔨 Building frontend for production..."
+    npm run build:production
 
     # Stop existing PM2 process
     pm2 stop karhesabi-server || true
     pm2 delete karhesabi-server || true
 
-    # Start server with PM2
-    echo "🚀 Starting server..."
+    # Start server with PM2 in production mode
+    echo "🚀 Starting server in production mode..."
     cd server
-    TRENDYOL_ENV=test pm2 start trendyol-proxy.js --name karhesabi-server
+    NODE_ENV=production TRENDYOL_ENV=production pm2 start trendyol-proxy.js --name karhesabi-server
 
     # Show PM2 status
     pm2 status

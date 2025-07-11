@@ -14,7 +14,7 @@ const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'production'
   ? 'https://api.trendyol.com'
   : process.env.NODE_ENV === 'production' 
     ? 'https://api.trendyol.com'
-    : 'https://api.trendyol.com';
+    : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {

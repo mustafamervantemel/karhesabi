@@ -15,8 +15,9 @@
     "server:start": "cd server && npm start",
     "server:install": "cd server && npm install",
     "build:full": "npm run build && npm run server:install",
-    "build:production": "NODE_ENV=production vite build --mode production",
-    "test:start": "concurrently \"npm run server:test\" \"npm run dev:test\""
+    "build:production": "NODE_ENV=production VITE_TRENDYOL_ENV=production vite build --mode production",
+    "test:start": "concurrently \"npm run server:test\" \"npm run dev:test\"",
+    "validate:production": "node scripts/validate-production.js"
   },
   "dependencies": {
     "firebase": "^10.13.1",
