@@ -3,9 +3,9 @@ const getProxyBaseUrl = () => {
   const mode = import.meta.env.VITE_TRENDYOL_ENV || import.meta.env.MODE;
   
   if (mode === 'test') {
-    return import.meta.env.VITE_PROXY_BASE_URL_TEST || 'https://karhesabi.vercel.app/api/trendyol';
+    return import.meta.env.VITE_PROXY_BASE_URL_TEST || 'http://165.232.68.91:4000/api/trendyol';
   } else if (mode === 'production') {
-    return import.meta.env.VITE_PROXY_BASE_URL_PRODUCTION || 'https://karhesabi.vercel.app/api/trendyol';
+    return import.meta.env.VITE_PROXY_BASE_URL_PRODUCTION || 'http://165.232.68.91:4000/api/trendyol';
   } else {
     return import.meta.env.VITE_PROXY_BASE_URL || 'http://localhost:4000/api/trendyol';
   }
