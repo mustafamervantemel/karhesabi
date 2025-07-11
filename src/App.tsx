@@ -63,11 +63,7 @@ function AppContent() {
           />
           <Route
             path="/entegrasyon"
-            element={
-              <ProtectedRoute>
-                <TrendyolIntegration />
-              </ProtectedRoute>
-            }
+            element={<TrendyolIntegration />}
           />
           <Route
             path="/panel"

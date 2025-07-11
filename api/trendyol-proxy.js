@@ -11,9 +11,9 @@ const httpsAgent = new https.Agent({
 
 // Trendyol API base URL - Production ortamı
 const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'production' 
-  ? 'https://api.trendyol.com'
+  ? 'https://apigw.trendyol.com'
   : process.env.NODE_ENV === 'production' 
-    ? 'https://api.trendyol.com'
+    ? 'https://apigw.trendyol.com'
     : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
@@ -291,7 +291,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret, Seller ID ve batchId gerekli' });
         }
         const batchResult = await makeTrendyolRequest(
-          `/gpgw/v1/${sellerIdBatch}/check-status`,
+          `/sapigw/suppliers/${sellerIdBatch}/check-status`,
           { 
             apiKey: apiKeyBatch, 
             apiSecret: apiSecretBatch, 
@@ -310,7 +310,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
         }
         const categoriesResult = await makeTrendyolRequest(
-          `/gpgw/v1/${sellerIdCat}/lookup/product-categories/by-barcodes`,
+          `/sapigw/suppliers/${sellerIdCat}/product-categories`,
           { apiKey: apiKeyCat, apiSecret: apiSecretCat, sellerId: sellerIdCat }
         );
         return res.json({ success: true, categories: categoriesResult });
@@ -324,7 +324,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
         }
         const originsResult = await makeTrendyolRequest(
-          `/gpgw/v1/${sellerIdOrigin}/lookup/origins`,
+          `/sapigw/suppliers/${sellerIdOrigin}/origins`,
           { apiKey: apiKeyOrigin, apiSecret: apiSecretOrigin, sellerId: sellerIdOrigin }
         );
         return res.json({ success: true, origins: originsResult });

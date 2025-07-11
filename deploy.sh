@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # DigitalOcean Deployment Script
-# IP: 167.71.42.27
+# IP: 165.232.68.91
 
 echo "🚀 Starting deployment to DigitalOcean..."
 
 # SSH bağlantısı kontrol et
 echo "📡 Checking SSH connection..."
-ssh -o ConnectTimeout=10 root@167.71.42.27 "echo 'SSH connection successful'"
+ssh -o ConnectTimeout=10 root@165.232.68.91 "echo 'SSH connection successful'"
 
 if [ $? -ne 0 ]; then
     echo "❌ SSH connection failed. Please check:"
@@ -19,7 +19,7 @@ fi
 
 # Server'a deploy et
 echo "📦 Deploying to server..."
-ssh root@167.71.42.27 << 'EOF'
+ssh root@165.232.68.91 << 'EOF'
     # Update system
     apt update
 
@@ -76,8 +76,8 @@ ssh root@167.71.42.27 << 'EOF'
     pm2 status
 
     echo "✅ Deployment completed!"
-    echo "🌐 Server accessible at: http://167.71.42.27:4000"
+    echo "🌐 Server accessible at: http://165.232.68.91:4000"
 EOF
 
 echo "✅ Deployment script completed!"
-echo "🌐 Your application should be available at: http://167.71.42.27:4000"
+echo "🌐 Your application should be available at: http://165.232.68.91:4000"

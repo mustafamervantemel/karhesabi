@@ -56,11 +56,13 @@ const httpsAgent = new https.Agent({
 });
 
 // Trendyol API base URL - Test/Production ortamına göre
-const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'test' 
-  ? 'https://stageapigw.trendyol.com'
-  : process.env.NODE_ENV === 'production' 
-    ? 'https://apigw.trendyol.com'
-    : 'https://stageapigw.trendyol.com';
+const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'production' 
+  ? 'https://apigw.trendyol.com'
+  : process.env.TRENDYOL_ENV === 'test' 
+    ? 'https://stageapigw.trendyol.com'
+    : process.env.NODE_ENV === 'production' 
+      ? 'https://apigw.trendyol.com'
+      : 'https://stageapigw.trendyol.com';
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
@@ -112,7 +114,7 @@ app.post('/api/trendyol/test-connection', async (req, res) => {
     return res.status(400).json({ success: false, error: 'API Key ve API Secret gerekli' });
   }
   try {
-    const info = await makeTrendyolRequest(`/suppliers`, { apiKey, apiSecret });
+    const info = await makeTrendyolRequest(`/sapigw/suppliers`, { apiKey, apiSecret });
     const sellerInfo = Array.isArray(info) ? info[0] : info;
     res.json({ success: true, sellerInfo });
   } catch (err) {
@@ -127,7 +129,7 @@ app.get('/api/trendyol/seller-info', async (req, res) => {
     return res.status(400).json({ success: false, error: 'API Key ve API Secret gerekli' });
   }
   try {
-    const info = await makeTrendyolRequest('/suppliers', { apiKey, apiSecret });
+    const info = await makeTrendyolRequest('/sapigw/suppliers', { apiKey, apiSecret });
     res.json({ success: true, sellerInfo: info[0] || info });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -142,7 +144,7 @@ app.get('/api/trendyol/products', async (req, res) => {
   }
   try {
     const products = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/products`,
+      `/sapigw/suppliers/${sellerId}/products`,
       { apiKey, apiSecret, params: { page, size } }
     );
     res.json({ success: true, products });
@@ -158,7 +160,7 @@ app.get('/api/trendyol/orders', async (req, res) => {
     return res.status(400).json({ success: false, error: 'API Key, API Secret ve Seller ID gerekli' });
   }
   try {
-    let endpoint = `/suppliers/${sellerId}/orders`;
+    let endpoint = `/sapigw/suppliers/${sellerId}/orders`;
     const params = { page, size };
     if (status) params.status = status;
     const orders = await makeTrendyolRequest(endpoint, { apiKey, apiSecret, params });
@@ -176,7 +178,7 @@ app.post('/api/trendyol/update-stock', async (req, res) => {
   }
   try {
     const result = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/products/stock-updates`,
+      `/sapigw/suppliers/${sellerId}/products/stock-updates`,
       { method: 'POST', apiKey, apiSecret, body: { items: stockUpdates } }
     );
     res.json({ success: true, result });
@@ -193,7 +195,7 @@ app.post('/api/trendyol/update-price', async (req, res) => {
   }
   try {
     const result = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/products/price-updates`,
+      `/sapigw/suppliers/${sellerId}/products/price-updates`,
       { method: 'POST', apiKey, apiSecret, body: { items: priceUpdates } }
     );
     res.json({ success: true, result });
@@ -209,7 +211,7 @@ app.get('/api/trendyol/categories', async (req, res) => {
     return res.status(400).json({ success: false, error: 'API Key ve API Secret gerekli' });
   }
   try {
-    const categories = await makeTrendyolRequest('/product-categories', { apiKey, apiSecret });
+    const categories = await makeTrendyolRequest('/sapigw/product-categories', { apiKey, apiSecret });
     res.json({ success: true, categories });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -224,7 +226,7 @@ app.get('/api/trendyol/shipment-providers', async (req, res) => {
   }
   try {
     const providers = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/shipment-providers`,
+      `/sapigw/suppliers/${sellerId}/shipment-providers`,
       { apiKey, apiSecret }
     );
     res.json({ success: true, providers });
@@ -241,7 +243,7 @@ app.put('/api/trendyol/update-order-status', async (req, res) => {
   }
   try {
     const result = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/orders/${orderId}/status`,
+      `/sapigw/suppliers/${sellerId}/orders/${orderId}/status`,
       { method: 'PUT', apiKey, apiSecret, body: { status } }
     );
     res.json({ success: true, result });
@@ -258,7 +260,7 @@ app.post('/api/trendyol/create-shipment', async (req, res) => {
   }
   try {
     const result = await makeTrendyolRequest(
-      `/suppliers/${sellerId}/orders/${orderId}/shipment`,
+      `/sapigw/suppliers/${sellerId}/orders/${orderId}/shipment`,
       { method: 'POST', apiKey, apiSecret, body: shipmentData }
     );
     res.json({ success: true, result });
