@@ -274,6 +274,48 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Debug endpoint for Trendyol API testing
+app.get('/api/trendyol/debug', (req, res) => {
+  const { apiKey, apiSecret } = req.query;
+  
+  if (!apiKey || !apiSecret) {
+    return res.json({
+      error: 'API Key ve API Secret gerekli',
+      endpoint: TRENDYOL_BASE_URL,
+      env: process.env.TRENDYOL_ENV,
+      nodeEnv: process.env.NODE_ENV,
+      requestExample: {
+        url: `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
+        headers: {
+          'Authorization': 'Basic [base64_encoded_credentials]',
+          'Content-Type': 'application/json',
+          'User-Agent': 'SelfIntegration'
+        }
+      }
+    });
+  }
+  
+  // Test basic auth encoding
+  const credentials = `${apiKey}:${apiSecret}`;
+  const encodedCredentials = Buffer.from(credentials, 'utf8').toString('base64');
+  
+  res.json({
+    debug: 'Trendyol API Debug Info',
+    endpoint: TRENDYOL_BASE_URL,
+    environment: process.env.TRENDYOL_ENV,
+    nodeEnv: process.env.NODE_ENV,
+    apiKeyLength: apiKey.length,
+    apiSecretLength: apiSecret.length,
+    encodedCredentials: encodedCredentials,
+    testUrl: `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
+    curlCommand: `curl -X GET "${TRENDYOL_BASE_URL}/sapigw/suppliers" \\
+  -H "Authorization: Basic ${encodedCredentials}" \\
+  -H "Content-Type: application/json" \\
+  -H "User-Agent: SelfIntegration" \\
+  -v`
+  });
+});
+
 // Statik dosyaları sun
 app.use(express.static(path.join(__dirname, '../dist')));
 
