@@ -18,6 +18,15 @@ const TRENDYOL_BASE_URL = process.env.TRENDYOL_ENV === 'production'
 
 // Helper: Trendyol'a istek at
 async function makeTrendyolRequest(endpoint, options = {}) {
+  // API credentials validation
+  if (!options.apiKey || !options.apiSecret) {
+    throw new Error('API Key ve API Secret gerekli');
+  }
+  
+  if (typeof options.apiKey !== 'string' || typeof options.apiSecret !== 'string') {
+    throw new Error('API Key ve API Secret string formatında olmalı');
+  }
+  
   let url = `${TRENDYOL_BASE_URL}${endpoint}`;
   
   // Query parametrelerini URL'e ekle
@@ -38,11 +47,22 @@ async function makeTrendyolRequest(endpoint, options = {}) {
   const userAgent = options.sellerId
     ? `${options.sellerId} - SelfIntegration`
     : 'SelfIntegration';
-  const headers = {
-    Authorization: `Basic ${Buffer.from(`${options.apiKey}:${options.apiSecret}`).toString('base64')}`,
-    'Content-Type': 'application/json',
-    'User-Agent': userAgent
-  };
+  
+  // Güvenli base64 encoding
+  let headers;
+  try {
+    const credentials = `${options.apiKey}:${options.apiSecret}`;
+    const encodedCredentials = Buffer.from(credentials, 'utf8').toString('base64');
+    
+    headers = {
+      Authorization: `Basic ${encodedCredentials}`,
+      'Content-Type': 'application/json',
+      'User-Agent': userAgent
+    };
+  } catch (error) {
+    console.error('Base64 encoding error:', error);
+    throw new Error('API bilgilerinde encoding hatası');
+  }
 
   const fetchOptions = {
     method: options.method || 'GET',
@@ -58,12 +78,23 @@ async function makeTrendyolRequest(endpoint, options = {}) {
     let errorMessage = `Trendyol API Error: ${response.status} - ${response.statusText}`;
     try {
       const errorData = await response.json();
-      errorMessage += ` - ${errorData.message || JSON.stringify(errorData)}`;
+      if (errorData.message) {
+        errorMessage += ` - ${errorData.message}`;
+      } else if (errorData.error) {
+        errorMessage += ` - ${errorData.error}`;
+      } else {
+        errorMessage += ` - ${JSON.stringify(errorData)}`;
+      }
     } catch (e) {
       // If JSON parsing fails, use the response text
-      const errorText = await response.text();
-      errorMessage += ` - ${errorText}`;
+      try {
+        const errorText = await response.text();
+        errorMessage += ` - ${errorText}`;
+      } catch (textError) {
+        errorMessage += ` - Response could not be parsed`;
+      }
     }
+    console.error('Trendyol API Error Details:', errorMessage);
     throw new Error(errorMessage);
   }
   
