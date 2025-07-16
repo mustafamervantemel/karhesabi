@@ -26,7 +26,13 @@ const corsOptions = {
       'https://167.71.42.27:3000',
       'http://167.71.42.27:4000',
       'https://167.71.42.27:4000',
-      'https://167.71.42.27:5173'
+      'https://167.71.42.27:5173',
+      'http://165.232.68.91:4000',
+      'https://165.232.68.91:4000',
+      'http://165.232.68.91:3000',
+      'https://165.232.68.91:3000',
+      'http://165.232.68.91:5173',
+      'https://165.232.68.91:5173'
     ];
     
     // Allow requests with no origin (like mobile apps or curl requests)
@@ -99,10 +105,36 @@ async function makeTrendyolRequest(endpoint, options = {}) {
     ...(options.body && { body: JSON.stringify(options.body) })
   };
 
+  console.log('🔍 Trendyol API Request:', {
+    url,
+    method: fetchOptions.method,
+    headers: {
+      ...fetchOptions.headers,
+      Authorization: '[MASKED]'
+    }
+  });
+
   const response = await fetch(url, fetchOptions);
-  const data = await response.json();
+  
+  console.log('📡 Trendyol API Response:', {
+    status: response.status,
+    statusText: response.statusText,
+    headers: Object.fromEntries(response.headers.entries())
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch (e) {
+    const textData = await response.text();
+    console.log('❌ Non-JSON Response:', textData);
+    throw new Error(`Trendyol API Error: ${response.status} – ${response.statusText} – ${textData}`);
+  }
+
+  console.log('📦 Trendyol API Data:', data);
+
   if (!response.ok) {
-    throw new Error(`Trendyol API Error: ${response.status} – ${data.message || response.statusText}`);
+    throw new Error(`Trendyol API Error: ${response.status} – ${data.message || data.error || response.statusText}`);
   }
   return data;
 }
@@ -284,14 +316,12 @@ app.get('/api/trendyol/debug', (req, res) => {
       endpoint: TRENDYOL_BASE_URL,
       env: process.env.TRENDYOL_ENV,
       nodeEnv: process.env.NODE_ENV,
-      requestExample: {
-        url: `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
-        headers: {
-          'Authorization': 'Basic [base64_encoded_credentials]',
-          'Content-Type': 'application/json',
-          'User-Agent': 'SelfIntegration'
-        }
-      }
+      possibleEndpoints: [
+        `${TRENDYOL_BASE_URL}/suppliers`,
+        `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
+        `${TRENDYOL_BASE_URL}/gpgw/suppliers`,
+        `${TRENDYOL_BASE_URL}/v1/suppliers`
+      ]
     });
   }
   
@@ -300,19 +330,66 @@ app.get('/api/trendyol/debug', (req, res) => {
   const encodedCredentials = Buffer.from(credentials, 'utf8').toString('base64');
   
   res.json({
-    debug: 'Trendyol API Debug Info',
+    debug: 'Trendyol Production API Debug',
     endpoint: TRENDYOL_BASE_URL,
     environment: process.env.TRENDYOL_ENV,
     nodeEnv: process.env.NODE_ENV,
     apiKeyLength: apiKey.length,
     apiSecretLength: apiSecret.length,
     encodedCredentials: encodedCredentials,
-    testUrl: `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
-    curlCommand: `curl -X GET "${TRENDYOL_BASE_URL}/sapigw/suppliers" \\
-  -H "Authorization: Basic ${encodedCredentials}" \\
-  -H "Content-Type: application/json" \\
-  -H "User-Agent: SelfIntegration" \\
-  -v`
+    testEndpoints: [
+      `${TRENDYOL_BASE_URL}/suppliers`,
+      `${TRENDYOL_BASE_URL}/sapigw/suppliers`,
+      `${TRENDYOL_BASE_URL}/gpgw/suppliers`,
+      `${TRENDYOL_BASE_URL}/v1/suppliers`
+    ],
+    curlCommands: {
+      basic: `curl -X GET "${TRENDYOL_BASE_URL}/suppliers" -H "Authorization: Basic ${encodedCredentials}" -H "Content-Type: application/json" -H "User-Agent: 994801 - SelfIntegration" -v`,
+      sapigw: `curl -X GET "${TRENDYOL_BASE_URL}/sapigw/suppliers" -H "Authorization: Basic ${encodedCredentials}" -H "Content-Type: application/json" -H "User-Agent: 994801 - SelfIntegration" -v`,
+      gpgw: `curl -X GET "${TRENDYOL_BASE_URL}/gpgw/suppliers" -H "Authorization: Basic ${encodedCredentials}" -H "Content-Type: application/json" -H "User-Agent: 994801 - SelfIntegration" -v`
+    }
+  });
+});
+
+// Multiple endpoint test for production debugging
+app.post('/api/trendyol/test-endpoints', async (req, res) => {
+  const { apiKey, apiSecret, sellerId } = req.body;
+  
+  if (!apiKey || !apiSecret) {
+    return res.status(400).json({ error: 'API Key ve API Secret gerekli' });
+  }
+
+  const endpoints = [
+    '/suppliers',
+    '/sapigw/suppliers', 
+    '/gpgw/suppliers',
+    '/v1/suppliers'
+  ];
+
+  const results = [];
+
+  for (const endpoint of endpoints) {
+    try {
+      console.log(`\n🧪 Testing endpoint: ${endpoint}`);
+      const result = await makeTrendyolRequest(endpoint, { apiKey, apiSecret, sellerId });
+      results.push({
+        endpoint,
+        status: 'success',
+        data: result
+      });
+    } catch (error) {
+      results.push({
+        endpoint,
+        status: 'error',
+        error: error.message
+      });
+    }
+  }
+
+  res.json({
+    message: 'Production endpoint test completed',
+    baseUrl: TRENDYOL_BASE_URL,
+    results
   });
 });
 
@@ -327,7 +404,7 @@ app.get(/^\/(?!api).*/, (req, res) => {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Trendyol Proxy Server running on port ${PORT}`);
-  console.log(`🌐 Server accessible at: http://192.168.1.51:${PORT}`);
+  console.log(`🌐 Server accessible at: http://165.232.68.91:${PORT}`);
   console.log(`🔧 Environment: ${process.env.TRENDYOL_ENV || 'development'}`);
   console.log(`📡 Trendyol API: ${TRENDYOL_BASE_URL}`);
 });

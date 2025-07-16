@@ -3,50 +3,17 @@
 // Production'da bu bilgiler environment variables olarak saklanmalı
 
 export const TRENDYOL_CONFIG = {
-  // Test ortamı için Trendyol UP yetkilendirmesi (IP: 167.71.42.27)
-  TEST: {
-    integrationCode: null, // Kullanıcıdan alınacak
-    apiKey: null, // Kullanıcıdan alınacak
-    apiSecret: null, // Kullanıcıdan alınacak
-    token: null, // API Key:Secret'tan oluşturulacak
-    baseUrl: 'https://stageapigw.trendyol.com',
-    sellerId: null, // API'den alınacak
-    allowedIp: '167.71.42.27'
-  },
-  
-  // Geliştirme için test mağazası bilgileri (gerçek API bilgileri kullanılacak)
-  DEVELOPMENT: {
-    integrationCode: null, // Kullanıcıdan alınacak
-    apiKey: null, // Kullanıcıdan alınacak
-    apiSecret: null, // Kullanıcıdan alınacak
-    token: null, // API Key:Secret'tan oluşturulacak
-    baseUrl: 'https://stageapigw.trendyol.com',
-    sellerId: null // API'den alınacak
-  },
-  
-  // Production için environment variables
   PRODUCTION: {
     integrationCode: import.meta.env.VITE_TRENDYOL_INTEGRATION_CODE,
     apiKey: import.meta.env.VITE_TRENDYOL_API_KEY,
     apiSecret: import.meta.env.VITE_TRENDYOL_API_SECRET,
     token: import.meta.env.VITE_TRENDYOL_TOKEN,
-    baseUrl: 'https://api.trendyol.com',
+    baseUrl: 'https://apigw.trendyol.com',
     sellerId: null
   }
 };
 
-// Aktif konfigürasyonu seç
-export const getTrendyolConfig = () => {
-  const mode = import.meta.env.VITE_TRENDYOL_ENV || import.meta.env.MODE;
-  
-  if (mode === 'test') {
-    return TRENDYOL_CONFIG.TEST;
-  } else if (mode === 'production') {
-    return TRENDYOL_CONFIG.PRODUCTION;
-  } else {
-    return TRENDYOL_CONFIG.DEVELOPMENT;
-  }
-};
+export const getTrendyolConfig = () => TRENDYOL_CONFIG.PRODUCTION;
 
 // API endpoint'leri
 export const TRENDYOL_ENDPOINTS = {
